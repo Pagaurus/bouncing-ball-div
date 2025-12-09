@@ -1,0 +1,124 @@
+<head>
+    <title>My website</Title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+</head>
+<body style="font-family: 'Nunito Sans'">
+    <div id="ball" style="position: absolute; width: 100px; height: 100px; background: #f00; border-radius: 100%; z-index: -1"></div>
+    <h1 style="user-select: none">Welcome to "My Website"!</h1>
+    <p style="user-select: none">This is a website full of fun and games.</p>
+    
+    <script>
+        let mouse = {
+            x: 0,
+            y: 0,
+            xVel: 0,
+            yVel: 0,
+        }
+    
+        const ball = {
+            player: document.querySelector("#ball"),
+            x: 0,
+            y: 0,
+            yVel: 0,
+            xVel: 10,
+            w: 100,
+            h: 100
+        }
+
+        let selected = false;
+
+        let gravity = 2;
+        
+        let restitution = 0.9;
+        let friction = 0.97;
+
+        let screenWidth = window.innerWidth;
+        let screenHeight = window.innerHeight;
+
+        function animate(){
+            if(!selected){
+                ball.x += ball.xVel;
+
+                ball.yVel += gravity;
+                ball.y += ball.yVel;
+
+            
+                if(ball.y + ball.h >= screenHeight) ball.xVel *= friction;
+
+                if(ball.x + ball.w > screenWidth){
+                    ball.xVel *= -1;
+                    ball.x = screenWidth - ball.w;
+                }
+
+                if(ball.y + ball.h > screenHeight){
+                    ball.yVel *= -restitution;
+                    ball.y = screenHeight - ball.h;
+                }
+
+                if(ball.x < 0){
+                    ball.xVel *= -1;
+                    ball.x = 0;
+                }
+
+                if(ball.y < 0){
+                    ball.yVel *= -1;
+                    ball.y = 0;
+                }
+            }
+
+            ball.player.style["left"] = "" + ball.x + "px";
+            ball.player.style["top"] = "" + ball.y + "px";
+
+            requestAnimationFrame(animate);
+        }
+
+        function changeBallColour(){
+            ball.player.style["background-color"] = `rgb(
+		${
+			Math.random()*254
+		},${
+			Math.random()*254
+		},${
+			Math.random()*254
+		})`;
+        }
+
+        window.addEventListener("resize", (e)=>{
+            screenWidth = window.innerWidth;
+            screenHeight = window.innerHeight;
+        })
+
+        window.addEventListener("mousemove", (e)=>{
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            mouse.xVel = e.movementX + mouse.xVel / 2;
+            mouse.yVel = e.movementY + mouse.yVel / 2;
+
+            if(selected){
+                ball.x += e.movementX;
+                ball.y += e.movementY;
+            }
+        })
+
+        ball.player.addEventListener("mousedown", ()=>{
+            selected = true;
+
+            changeBallColour();
+        })
+
+        document.addEventListener("mouseup", ()=>{
+            if(selected){
+                ball.xVel = mouse.xVel;
+                ball.yVel = mouse.yVel;
+            }
+            
+            selected = false;
+        })
+
+        changeBallColour();
+
+        requestAnimationFrame(animate);
+    </script>
+</body>
